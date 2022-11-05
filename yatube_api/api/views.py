@@ -3,7 +3,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 
-from posts.models import Post, Group, Follow, User
+from posts.models import Post, Group, Follow
 from api.serializers import (
     PostSerializer, CommentSerializer, GroupSerializer, FollowSerializer
 )
