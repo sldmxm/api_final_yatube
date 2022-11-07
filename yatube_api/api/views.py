@@ -3,7 +3,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 
-from posts.models import Post, Group, Follow
+from posts.models import Post, Group
 from api.serializers import (
     PostSerializer, CommentSerializer, GroupSerializer, FollowSerializer
 )
@@ -11,7 +11,10 @@ from api.permissions import IsAuthorOrReadOnly
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
+    # логично было бы оставить в модели обратную сортировку,
+    # а здесь сделать прямую, чтобы не портить воображаемую выдачу в html,
+    # но так тесты тоже не проходят, хотя все работает
+    queryset = Post.objects.order_by('pub_date',)
     serializer_class = PostSerializer
     permission_classes = (IsAuthorOrReadOnly, )
     pagination_class = LimitOffsetPagination
@@ -48,10 +51,14 @@ class FollowViewSet(mixins.CreateModelMixin,
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('following__username',)
+    # можно сделать, конечно, поиск по полному совпадению,
+    # но решил выбрать компромиссный вариант,
+    # а сделать case-sensitive поиск по латинице на sqlite,
+    # похоже, нестандартная история
+    search_fields = ('^following__username',)
 
     def get_queryset(self):
-        return Follow.objects.filter(user=self.request.user)
+        return self.request.user.follower.all()
 
     def perform_create(self, serializer):
         serializer.save(
