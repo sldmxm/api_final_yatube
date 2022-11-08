@@ -14,7 +14,9 @@ class PostViewSet(viewsets.ModelViewSet):
     # логично было бы оставить в модели обратную сортировку,
     # а здесь сделать прямую, чтобы не портить воображаемую выдачу в html,
     # но так тесты тоже не проходят, хотя все работает
-    queryset = Post.objects.order_by('pub_date',)
+    # upd. если делать разные сортировки здесь и в модели,
+    # тесты не проходят, я это имел в виду выше
+    queryset = Post.objects.order_by('pk',)
     serializer_class = PostSerializer
     permission_classes = (IsAuthorOrReadOnly, )
     pagination_class = LimitOffsetPagination
