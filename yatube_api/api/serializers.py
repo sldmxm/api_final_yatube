@@ -69,5 +69,6 @@ class FollowSerializer(serializers.ModelSerializer):
             ),
             SelfFollowingValidator(
                 fields=fields,
+                message='Нельзя подписаться на самого себя!',
             ),
         ]
